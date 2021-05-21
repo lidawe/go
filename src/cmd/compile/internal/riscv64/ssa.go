@@ -426,6 +426,7 @@ func ssaGenValue(s *gc.SSAGenState, v *ssa.Value) {
 		p1.RegTo2 = riscv.REG_ZERO
 
 	case ssa.OpRISCV64LoweredAtomicAdd32, ssa.OpRISCV64LoweredAtomicAdd64:
+
 		p := s.Prog(riscv.AMOV)
 		p.From.Type = obj.TYPE_REG
 		p.From.Reg = v.Args[1].Reg()
@@ -448,6 +449,7 @@ func ssaGenValue(s *gc.SSAGenState, v *ssa.Value) {
 		p2.From.Reg = riscv.REG_TMP
 		p2.Reg = v.Args[1].Reg()
 		p2.To.Type = obj.TYPE_REG
+		p2.To.Reg = v.Reg0()
 
 	case ssa.OpRISCV64LoweredAtomicExchange32, ssa.OpRISCV64LoweredAtomicExchange64:
 		p := s.Prog(riscv.AMOV)
