@@ -408,47 +408,64 @@ func ssaGenValue(s *gc.SSAGenState, v *ssa.Value) {
 		s.Prog(riscv.AFENCE)
 
 	case ssa.OpRISCV64LoweredAtomicStore32, ssa.OpRISCV64LoweredAtomicStore64:
+		p := s.Prog(riscv.AMOV)
+		p.From.Type = obj.TYPE_REG
+		p.From.Reg = v.Args[1].Reg()
+		p.To.Type = obj.TYPE_REG
+		p.To.Reg = v.Args[1].Reg()
+
 		as := riscv.AAMOSWAPW
 		if v.Op == ssa.OpRISCV64LoweredAtomicStore64 {
 			as = riscv.AAMOSWAPD
 		}
-		p := s.Prog(as)
-		p.From.Type = obj.TYPE_REG
-		p.From.Reg = v.Args[1].Reg()
-		p.To.Type = obj.TYPE_MEM
-		p.To.Reg = v.Args[0].Reg()
-		p.RegTo2 = riscv.REG_ZERO
+		p1 := s.Prog(as)
+		p1.From.Type = obj.TYPE_REG
+		p1.From.Reg = v.Args[1].Reg()
+		p1.To.Type = obj.TYPE_MEM
+		p1.To.Reg = v.Args[0].Reg()
+		p1.RegTo2 = riscv.REG_ZERO
 
 	case ssa.OpRISCV64LoweredAtomicAdd32, ssa.OpRISCV64LoweredAtomicAdd64:
+		p := s.Prog(riscv.AMOV)
+		p.From.Type = obj.TYPE_REG
+		p.From.Reg = v.Args[1].Reg()
+		p.To.Type = obj.TYPE_REG
+		p.To.Reg = v.Args[1].Reg()
+
 		as := riscv.AAMOADDW
 		if v.Op == ssa.OpRISCV64LoweredAtomicAdd64 {
 			as = riscv.AAMOADDD
 		}
-		p := s.Prog(as)
-		p.From.Type = obj.TYPE_REG
-		p.From.Reg = v.Args[1].Reg()
-		p.To.Type = obj.TYPE_MEM
-		p.To.Reg = v.Args[0].Reg()
-		p.RegTo2 = riscv.REG_TMP
+		p1 := s.Prog(as)
+		p1.From.Type = obj.TYPE_REG
+		p1.From.Reg = v.Args[1].Reg()
+		p1.To.Type = obj.TYPE_MEM
+		p1.To.Reg = v.Args[0].Reg()
+		p1.RegTo2 = riscv.REG_TMP
 
 		p2 := s.Prog(riscv.AADD)
 		p2.From.Type = obj.TYPE_REG
 		p2.From.Reg = riscv.REG_TMP
 		p2.Reg = v.Args[1].Reg()
 		p2.To.Type = obj.TYPE_REG
-		p2.To.Reg = v.Reg0()
 
 	case ssa.OpRISCV64LoweredAtomicExchange32, ssa.OpRISCV64LoweredAtomicExchange64:
+		p := s.Prog(riscv.AMOV)
+		p.From.Type = obj.TYPE_REG
+		p.From.Reg = v.Args[1].Reg()
+		p.To.Type = obj.TYPE_REG
+		p.To.Reg = v.Args[1].Reg()
+
 		as := riscv.AAMOSWAPW
 		if v.Op == ssa.OpRISCV64LoweredAtomicExchange64 {
 			as = riscv.AAMOSWAPD
 		}
-		p := s.Prog(as)
-		p.From.Type = obj.TYPE_REG
-		p.From.Reg = v.Args[1].Reg()
-		p.To.Type = obj.TYPE_MEM
-		p.To.Reg = v.Args[0].Reg()
-		p.RegTo2 = v.Reg0()
+		p1 := s.Prog(as)
+		p1.From.Type = obj.TYPE_REG
+		p1.From.Reg = v.Args[1].Reg()
+		p1.To.Type = obj.TYPE_MEM
+		p1.To.Reg = v.Args[0].Reg()
+		p1.RegTo2 = v.Reg0()
 
 	case ssa.OpRISCV64LoweredAtomicCas32, ssa.OpRISCV64LoweredAtomicCas64:
 		// MOV  ZERO, Rout
