@@ -3428,7 +3428,7 @@ func init() {
 		func(s *state, n *Node, args []*ssa.Value) *ssa.Value {
 			return s.newValue1(ssa.OpBswap64, types.Types[TUINT64], args[0])
 		},
-		sys.AMD64, sys.ARM64, sys.ARM, sys.S390X)
+		sys.AMD64, sys.ARM64, sys.ARM, sys.S390X, sys.RISCV64)
 
 	/******** runtime/internal/atomic ********/
 	addF("runtime/internal/atomic", "Load",

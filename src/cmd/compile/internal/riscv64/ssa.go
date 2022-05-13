@@ -448,6 +448,7 @@ func ssaGenValue(s *gc.SSAGenState, v *ssa.Value) {
 		p2.From.Reg = riscv.REG_TMP
 		p2.Reg = v.Args[1].Reg()
 		p2.To.Type = obj.TYPE_REG
+		p2.To.Reg = v.Reg0()
 
 	case ssa.OpRISCV64LoweredAtomicExchange32, ssa.OpRISCV64LoweredAtomicExchange64:
 		p := s.Prog(riscv.AMOV)
@@ -638,7 +639,32 @@ func ssaGenValue(s *gc.SSAGenState, v *ssa.Value) {
 		p.To.Name = obj.NAME_EXTERN
 		p.To.Sym = gc.Duffcopy
 		p.To.Offset = v.AuxInt
-
+	//C910
+	case ssa.OpRISCV64MULA, ssa.OpRISCV64MULAH, ssa.OpRISCV64MULAW, ssa.OpRISCV64MULS,
+		ssa.OpRISCV64MULSH, ssa.OpRISCV64MULSW:
+		p := s.Prog(v.Op.Asm())
+		p.From.Type = obj.TYPE_REG
+		p.From.Reg = v.Args[0].Reg()
+		p.Reg = v.Args[1].Reg()
+		p.To.Type = obj.TYPE_REGREG2
+		p.To.Reg = v.Reg()
+		p.To.Offset = int64(v.Args[2].Reg())
+	case ssa.OpRISCV64SRRI:
+		p := s.Prog(v.Op.Asm())
+		p.From.Type = obj.TYPE_CONST
+		p.From.Offset = v.AuxInt
+		p.Reg = v.Args[0].Reg()
+		p.To.Type = obj.TYPE_REG
+		p.To.Reg = v.Reg()
+	case ssa.OpRISCV64TLRB, ssa.OpRISCV64TLRBU, ssa.OpRISCV64TLRH, ssa.OpRISCV64TLRHU,
+		ssa.OpRISCV64TLRW, ssa.OpRISCV64TLRWU, ssa.OpRISCV64TLRD:
+		p := s.Prog(v.Op.Asm())
+		p.From.Type = obj.TYPE_REG
+		p.From.Reg = v.Args[0].Reg()
+		p.From.Offset = v.AuxInt
+		p.Reg = v.Args[1].Reg()
+		p.To.Type = obj.TYPE_REGREG2
+		p.To.Reg = v.Reg()
 	default:
 		v.Fatalf("Unhandled op %v", v.Op)
 	}

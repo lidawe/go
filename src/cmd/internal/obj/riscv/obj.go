@@ -1322,6 +1322,9 @@ func encodeR(as obj.As, rs1, rs2, rd, funct3, funct7 uint32) uint32 {
 func encodeRIII(ins *instruction) uint32 {
 	return encodeR(ins.as, regI(ins.rs1), regI(ins.rs2), regI(ins.rd), ins.funct3, ins.funct7)
 }
+func encodeiRIII(ins *instruction) uint32 {
+	return encodeR(ins.as, regI(ins.rs1), regI(ins.rs2), regI(ins.rd), ins.funct3, ins.funct7+uint32(ins.imm))
+}
 
 func encodeRFFF(ins *instruction) uint32 {
 	return encodeR(ins.as, regF(ins.rs1), regF(ins.rs2), regF(ins.rd), ins.funct3, ins.funct7)
@@ -1464,15 +1467,17 @@ var (
 	// integer register inputs and an integer register output; sFEncoding
 	// indicates an S-type instruction with rs2 being a float register.
 
-	rIIIEncoding = encoding{encode: encodeRIII, validate: validateRIII, length: 4}
-	rFFFEncoding = encoding{encode: encodeRFFF, validate: validateRFFF, length: 4}
-	rFFIEncoding = encoding{encode: encodeRFFI, validate: validateRFFI, length: 4}
-	rFIEncoding  = encoding{encode: encodeRFI, validate: validateRFI, length: 4}
-	rIFEncoding  = encoding{encode: encodeRIF, validate: validateRIF, length: 4}
-	rFFEncoding  = encoding{encode: encodeRFF, validate: validateRFF, length: 4}
+	rIIIEncoding  = encoding{encode: encodeRIII, validate: validateRIII, length: 4}
+	riIIIEncoding = encoding{encode: encodeiRIII, validate: validateRIII, length: 4}
+	rFFFEncoding  = encoding{encode: encodeRFFF, validate: validateRFFF, length: 4}
+	rFFIEncoding  = encoding{encode: encodeRFFI, validate: validateRFFI, length: 4}
+	rFIEncoding   = encoding{encode: encodeRFI, validate: validateRFI, length: 4}
+	rIFEncoding   = encoding{encode: encodeRIF, validate: validateRIF, length: 4}
+	rFFEncoding   = encoding{encode: encodeRFF, validate: validateRFF, length: 4}
 
-	iIEncoding = encoding{encode: encodeII, validate: validateII, length: 4}
-	iFEncoding = encoding{encode: encodeIF, validate: validateIF, length: 4}
+	iIEncoding  = encoding{encode: encodeII, validate: validateII, length: 4}
+	iRIEncoding = encoding{encode: encodeII, validate: validateII, length: 4}
+	iFEncoding  = encoding{encode: encodeIF, validate: validateIF, length: 4}
 
 	sIEncoding = encoding{encode: encodeSI, validate: validateSI, length: 4}
 	sFEncoding = encoding{encode: encodeSF, validate: validateSF, length: 4}
@@ -1698,6 +1703,25 @@ var encodings = [ALAST & obj.AMask]encoding{
 	obj.ANOP:      pseudoOpEncoding,
 	obj.ADUFFZERO: pseudoOpEncoding,
 	obj.ADUFFCOPY: pseudoOpEncoding,
+
+	//C910
+	AMULA & obj.AMask:  rIIIEncoding,
+	AMULAH & obj.AMask: rIIIEncoding,
+	AMULAW & obj.AMask: rIIIEncoding,
+	AMULS & obj.AMask:  rIIIEncoding,
+	AMULSH & obj.AMask: rIIIEncoding,
+	AMULSW & obj.AMask: rIIIEncoding,
+
+	ASRRI & obj.AMask: iIEncoding,
+
+	ATLRB & obj.AMask:  riIIIEncoding,
+	ATLRBU & obj.AMask: riIIIEncoding,
+	ATLRH & obj.AMask:  riIIIEncoding,
+	ATLRHU & obj.AMask: riIIIEncoding,
+	ATLRW & obj.AMask:  riIIIEncoding,
+	ATLRWU & obj.AMask: riIIIEncoding,
+	ATLRD & obj.AMask:  riIIIEncoding,
+	//AMVEQZ & obj.AMask: rIIIEncoding,
 }
 
 // encodingForAs returns the encoding for an obj.As.

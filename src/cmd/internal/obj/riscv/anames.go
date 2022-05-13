@@ -254,5 +254,25 @@ var Anames = []string{
 	"NOT",
 	"SEQZ",
 	"SNEZ",
+
+	//C910
+	"MULA",
+	"MULAH",
+	"MULAW",
+	"MULS",
+	"MULSH",
+	"MULSW",
+	//"MVEQZ",
+	"SRRI",
+	"REV",
+
+	"TLRB",
+	"TLRBU",
+	"TLRH",
+	"TLRHU",
+	"TLRW",
+	"TLRWU",
+	"TLRD",
+
 	"LAST",
 }
